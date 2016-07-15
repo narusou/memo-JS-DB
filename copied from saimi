@@ -1,0 +1,75 @@
+<script type=”text/javascript”>
+    var objDBCon = null;
+   
+    //SQL ServerのDBオープン
+    function DbConOpen() {
+        objDBCon = new ActiveXObject(“ADODB.Connection”);
+        objDBCon.Open(“Driver={SQL Server};server=SERVERNAME;database=DBNAME;uid=USERNAME;pwd=PASSWORD;”);
+    }
+   
+    //DBクローズ
+    function DbConClose() {
+        objDBCon.Close();
+        objDBCon = null;
+    }
+   
+    //DB更新
+    function UpdateTable() {
+        var msg = “更新成功”;
+       
+        var sql = “UPDATE [MASTER_TABLE] SET COLUMN2 = ‘更新値’ WHERE [COLUMN1] = ‘001’”;
+       
+        //DBオープン
+        DbConOpen();
+       
+        //トランザクション
+        objDBCon.BeginTrans();
+        try {
+            //SQL実行
+            objDBCon.Execute(sql);
+            //コミット
+            objDBCon.CommitTrans();
+        }
+        catch (e) {
+            //ロールバック
+            objDBCon.RollbackTrans();
+            msg = “更新失敗”;
+        }
+       
+        //DBクローズ
+        DbConClose();
+       
+        alert(msg);
+    }
+   
+    //DB参照
+    function SelectTable() {
+        var msg = “データ取得成功”;
+       
+        var sql = “SELECT [COLUMN1], [COLUMN2], [COLUMN3] FROM [MASTER_TABLE] WHERE [COLUMN0] = ‘001’”;
+       
+        //DBオープン
+        DbConOpen();
+       
+        try {
+            //SQL実行 レコードセットを取得
+            var objRecordSet = objDBCon.Execute(sql);
+            while(!objRecordSet.EOF) {
+             var col1Value = objRecordSet(“COLUMN1”);
+             var col2Value = objRecordSet(“COLUMN2”);
+             var col3Value = objRecordSet(“COLUMN3”);
+             objRecordSet.MoveNext();
+            }
+           
+        }
+        catch (e) {
+            msg = “データ取得失敗”;
+        }
+       
+        //DBクローズ
+        DbConClose();
+       
+        alert(msg);
+    }
+   
+</script>
